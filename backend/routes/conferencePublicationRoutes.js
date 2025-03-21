@@ -4,7 +4,8 @@ import {
   getPendingConferencePublications,
   approveConferencePublication,
   deleteConferencePublication,
-  getApprovedConferencePublications
+  getApprovedConferencePublications,
+  getacceptingConferencePublications
 } from "../controllers/conferencePublicationController.js";
 
 const router = express.Router();
@@ -14,6 +15,8 @@ router.post("/submit", submitConferencePublication);
 
 // Route to get pending conference publications for admin
 router.get("/pending", getPendingConferencePublications);
+
+router.get("/approved", getacceptingConferencePublications);
 
 // Route to approve a conference publication
 router.put("/approve/:id", approveConferencePublication);

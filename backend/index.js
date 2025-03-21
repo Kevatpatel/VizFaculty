@@ -7,6 +7,7 @@ import departmentRouter from './routes/department.js'
 import publicationRouter from './routes/publicationRoutes.js'
 import journalPublicationRouter from './routes/journalPublicationRoutes.js';
 import conferencePublicationRouter from './routes/conferencePublicationRoutes.js'; 
+import userRoutes from './routes/userroutes.js'
 
 connectToDatabase();
 const app=express()
@@ -18,7 +19,8 @@ app.use('/api/department',departmentRouter)
 app.use('/api/faculty',facultyRouter)
 app.use('/api/publications', publicationRouter);
 app.use('/api/journal-publications', journalPublicationRouter);
-app.use('/api/conference-publications', conferencePublicationRouter); 
+app.use('/api/conference-publications', conferencePublicationRouter);
+app.use("/api/users", userRoutes); 
 app.listen(process.env.PORT,()=>{
     console.log(`server is running on port ${process.env.PORT}`)
 })

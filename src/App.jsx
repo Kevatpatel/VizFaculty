@@ -20,6 +20,8 @@ import JournalPublicationForm from "./components/JournelPublicationForm";
 import ConferencePublication from "./components/ConferencePublicationForm";
 import { JournalPublicationRequest } from "./components/JournalPublicationRequest";
 import { ConferencePublicationRequest } from "./components/ConferencePublicationRequest";
+import FacultyProfile from "./components/FacultyProfile";
+import Allpublications from "./components/Allpublications"
 
 
 
@@ -48,14 +50,14 @@ const App = () => {
             <Route path="/admin-dashboard/receivedpublications" element={<ReceivedPublication />} /> 
             <Route path="/admin-dashboard/receivedpublications/journalpublication" element={<JournalPublicationRequest/>}/>
             <Route path="/admin-dashboard/receivedpublications/conferencepublication" element={<ConferencePublicationRequest/>}/>
-            
+            <Route path="/admin-dashboard/publications" element = {<Allpublications/>}></Route>
           </Route>
         <Route path="/employee-dashboard" element={<FacultyHomepage />}></Route>
         <Route path="/employee-dashboard/journal-publication-form" element={<JournalPublicationForm />} />
         <Route path="/employee-dashboard/conference-publication-form" element={<ConferencePublication />} />
-       
+        <Route path="/employee-dashboard/profile" element={<FacultyProfile />}></Route>
       </Routes>
-    </BrowserRouter>
+    </BrowserRouter> 
   );
 };
 

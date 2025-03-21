@@ -46,37 +46,15 @@ const AdminSidebar = () => {
           <span>Department</span>
         </NavLink>
 
-        {/* Salary */}
+      
         <NavLink
-          to="/admin-dashboard/salary"
+          to="/admin-dashboard/publications"
           className={({ isActive }) =>
             `${isActive ? "bg-teal-500" : ""} flex items-center space-x-4 block py-2.5 px-4 rounded`
           }
         >
           <FaMoneyBillWave />
-          <span>Salary</span>
-        </NavLink>
-
-        {/* Leave */}
-        <NavLink
-          to="/admin-dashboard/leave"
-          className={({ isActive }) =>
-            `${isActive ? "bg-teal-500" : ""} flex items-center space-x-4 block py-2.5 px-4 rounded`
-          }
-        >
-          <FaCalendarAlt />
-          <span>Leave</span>
-        </NavLink>
-
-        {/* Settings */}
-        <NavLink
-          to="/admin-dashboard/settings"
-          className={({ isActive }) =>
-            `${isActive ? "bg-teal-500" : ""} flex items-center space-x-4 block py-2.5 px-4 rounded`
-          }
-        >
-          <FaCogs />
-          <span>Settings</span>
+          <span>Publications</span>
         </NavLink>
       </div>
     </div>

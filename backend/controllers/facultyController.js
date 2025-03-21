@@ -91,5 +91,32 @@ const getFaculty = async(req,res) =>{
     }
 }
 
+const getFacultyByEmail = async (req, res) => {
+    const { email } = req.params;
 
-export {addFaculty,upload,getFaculties,getFaculty}
+    try {
+        // Find the user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: false, error: "User not found" });
+        }
+
+        // Find faculty details using userId
+        const faculty = await Faculty.findOne({ userId: user._id })
+            .populate("userId", { password: 0 })
+            .populate("department");
+
+        if (!faculty) {
+            return res.status(404).json({ message: false, error: "Faculty profile not found" });
+        }
+
+        return res.status(200).json({ message: true, faculty });
+    } catch (error) {
+        console.error("Error fetching faculty profile by email:", error);
+        return res.status(500).json({ message: false, error: "Server error while fetching faculty profile" });
+    }
+};
+
+
+
+export {addFaculty,upload,getFaculties,getFaculty,getFacultyByEmail}

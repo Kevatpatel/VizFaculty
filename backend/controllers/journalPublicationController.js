@@ -43,6 +43,16 @@ export const getPendingPublications = async (req, res) => {
     }
 };
 
+const getacceptingPublications = async (req, res) => {
+    try {
+      const pendingPublications = await JournalPublication.find({ publicationStatus: "approved" });
+      res.status(200).json(pendingPublications);
+    } catch (error) {
+      console.error("Error fetching approved publications:", error);
+      res.status(500).json({ error: "Server error" });
+    }
+  };
+
 // ✅ Approve a journal publication
 export const approvePublication = async (req, res) => {
     try {
@@ -79,4 +89,4 @@ const getApprovedPublications = async (req, res) => {
 };
 
 // Export controllers as named exports
-export { getApprovedPublications };
+export { getApprovedPublications, getacceptingPublications};

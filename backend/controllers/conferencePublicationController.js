@@ -25,6 +25,16 @@ export const getPendingConferencePublications = async (req, res) => {
   }
 };
 
+export const getacceptingConferencePublications = async (req, res) => {
+  try {
+    const pendingPublications = await ConferencePublication.find({ status: "approved" });
+    res.json(pendingPublications);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching approved conference publications" });
+  }
+};
+
+
 // Approve a conference publication (change status to approved)
 export const approveConferencePublication = async (req, res) => {
   try {

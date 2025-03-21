@@ -3,27 +3,34 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { 
+  FileSpreadsheet, 
+  PlusCircle, 
+  BookOpen, 
+  Presentation, 
+  User, 
+  Download,
+  LogOut,
+  Settings 
+} from "lucide-react";
 
 const FacultyHomepage = () => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [approvedJournals, setApprovedJournals] = useState([]);
   const [approvedConferences, setApprovedConferences] = useState([]);
 
-  // Get faculty email from localStorage
   const facultyEmail = localStorage.getItem("email");
 
-  // Fetch approved journal and conference publications
   useEffect(() => {
     const fetchApprovedPublications = async () => {
       try {
-        // Fetch approved journal publications
         const journalResponse = await axios.get(
           `http://localhost:5000/api/journal-publications/approved/${facultyEmail}`
         );
         setApprovedJournals(journalResponse.data);
 
-        // Fetch approved conference publications
         const conferenceResponse = await axios.get(
           `http://localhost:5000/api/conference-publications/approved/${facultyEmail}`
         );
@@ -48,7 +55,17 @@ const FacultyHomepage = () => {
     setIsDropdownOpen(false);
   };
 
-  // 🔹 Export Functionality
+  const handleViewProfile = () => {
+    navigate("/employee-dashboard/profile");
+    setIsProfileMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    // Clear local storage and redirect to login
+    localStorage.clear();
+    navigate("/login");
+  };
+
   const exportToExcel = () => {
     const journalsData = approvedJournals.map((publication) => ({
       Title: publication.title,
@@ -64,17 +81,13 @@ const FacultyHomepage = () => {
       Year: publication.year,
     }));
 
-    // Create a new Excel workbook
     const workbook = XLSX.utils.book_new();
-    
-    // Convert to worksheet and add to workbook
     const journalSheet = XLSX.utils.json_to_sheet(journalsData);
     const conferenceSheet = XLSX.utils.json_to_sheet(conferencesData);
 
     XLSX.utils.book_append_sheet(workbook, journalSheet, "Journal Publications");
     XLSX.utils.book_append_sheet(workbook, conferenceSheet, "Conference Publications");
 
-    // Generate Excel File and Download
     const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
     const data = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 
@@ -82,116 +95,145 @@ const FacultyHomepage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <header className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-gray-900">Faculty Dashboard</h1>
+    <div className="min-h-screen bg-white">
+      <header className="bg-teal-600 text-white shadow-md sticky top-0 z-20">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <BookOpen className="w-8 h-8 text-white" />
+            <h1 className="text-2xl font-bold">Faculty Publications</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="relative">
+              <button
+                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                className="flex items-center space-x-2 bg-teal-700 px-3 py-2 rounded-full hover:bg-teal-800 transition"
+              >
+                <User className="w-5 h-5 text-white" />
+                <span className="font-medium">{facultyEmail}</span>
+              </button>
+              {isProfileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-teal-100 z-10 overflow-hidden">
+                  <button
+                    onClick={handleViewProfile}
+                    className="w-full text-left px-4 py-3 hover:bg-teal-50 transition flex items-center text-teal-700 hover:text-teal-900"
+                  >
+                    <Settings className="w-5 h-5 mr-2" />
+                    View Profile
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-3 hover:bg-red-50 transition flex items-center text-red-600 hover:text-red-800"
+                  >
+                    <LogOut className="w-5 h-5 mr-2" />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Profile Section */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-8">
-              <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-4"></div>
-              <h2 className="text-xl font-semibold text-center mb-4">Associate Professor</h2>
-              <p className="text-center text-gray-900">{facultyEmail}</p>
+      <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+        <div className="bg-white rounded-xl shadow-lg border border-teal-100 p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-teal-800 flex items-center">
+              <Presentation className="w-6 h-6 mr-2 text-teal-600" />
+              My Publications
+            </h2>
+            <div className="flex space-x-4">
+              <button
+                onClick={exportToExcel}
+                className="flex items-center bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Export to Excel
+              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex items-center bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition"
+                >
+                  <PlusCircle className="w-5 h-5 mr-2" />
+                  Add Publication
+                </button>
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-teal-100 z-10 overflow-hidden">
+                    <button
+                      onClick={handleJournalPublication}
+                      className="w-full text-left px-4 py-3 hover:bg-teal-50 transition flex items-center"
+                    >
+                      <FileSpreadsheet className="w-5 h-5 mr-2 text-teal-600" />
+                      Journal Publication
+                    </button>
+                    <button
+                      onClick={handleConferencePublication}
+                      className="w-full text-left px-4 py-3 hover:bg-teal-50 transition flex items-center"
+                    >
+                      <Presentation className="w-5 h-5 mr-2 text-teal-600" />
+                      Conference Publication
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Main Content Section */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Publications Section */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Publications</h2>
-                
-                <div className="flex space-x-4">
-                  {/* ✅ Export to Excel Button */}
-                  <button 
-                    onClick={exportToExcel}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200"
-                  >
-                    Export to Excel
-                  </button>
-
-                  {/* ✅ Add Publication Button */}
-                  <div className="relative">
-                    <button 
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2"
-                    >
-                      <span>Add Publication</span>
-                      <svg className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-
-                    {isDropdownOpen && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl z-10 border">
-                        <button
-                          onClick={handleJournalPublication}
-                          className="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-t-lg transition-colors duration-200"
-                        >
-                          Journal Publication
-                        </button>
-                        <button
-                          onClick={handleConferencePublication}
-                          className="w-full text-left px-4 py-3 hover:bg-gray-50 rounded-b-lg transition-colors duration-200"
-                        >
-                          Conference Publication
-                        </button>
-                      </div>
-                    )}
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-xl font-semibold text-teal-700 flex items-center">
+                <BookOpen className="w-5 h-5 mr-2 text-teal-600" />
+                Journal Publications
+              </h3>
+              <div className="mt-4 space-y-4">
+                {approvedJournals.length === 0 ? (
+                  <div className="bg-teal-50 border border-teal-200 p-4 rounded-lg text-center">
+                    <p className="text-teal-700 italic">No approved journal publications yet</p>
                   </div>
-                </div>
-              </div>
-
-              {/* Approved Journal Publications Section */}
-              <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Journal Publications</h3>
-                <div className="space-y-6">
-                  {approvedJournals.length === 0 ? (
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <p className="text-gray-500 text-center italic">No approved journal publications yet</p>
-                    </div>
-                  ) : (
-                    approvedJournals.map((publication) => (
-                      <div key={publication._id} className="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-900">{publication.title}</h3>
-                        <p className="text-gray-700"><strong>Authors:</strong> {publication.authors.join(", ")}</p>
-                        <p className="text-gray-700"><strong>Journal:</strong> {publication.journalName}</p>
-                        <p className="text-gray-700"><strong>Year:</strong> {publication.year}</p>
+                ) : (
+                  approvedJournals.map((publication) => (
+                    <div 
+                      key={publication._id} 
+                      className="bg-teal-50 p-4 rounded-lg shadow-sm border border-teal-100"
+                    >
+                      <h3 className="text-lg font-semibold text-teal-900 mb-2">{publication.title}</h3>
+                      <div className="space-y-1 text-teal-800">
+                        <p><strong>Authors:</strong> {publication.authors.join(", ")}</p>
+                        <p><strong>Journal:</strong> {publication.journalName}</p>
+                        <p><strong>Year:</strong> {publication.year}</p>
                       </div>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {/* Approved Conference Publications Section */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Conference Publications</h3>
-                <div className="space-y-6">
-                  {approvedConferences.length === 0 ? (
-                    <div className="bg-gray-50 rounded-lg p-6">
-                      <p className="text-gray-500 text-center italic">No approved conference publications yet</p>
                     </div>
-                  ) : (
-                    approvedConferences.map((publication) => (
-                      <div key={publication._id} className="bg-gray-50 p-5 rounded-lg shadow-sm border border-gray-200">
-                        <h3 className="text-lg font-semibold text-gray-900">{publication.title}</h3>
-                        <p className="text-gray-700"><strong>Authors:</strong> {publication.authors.join(", ")}</p>
-                        <p className="text-gray-700"><strong>Conference:</strong> {publication.conferenceName}</p>
-                        <p className="text-gray-700"><strong>Year:</strong> {publication.year}</p>
-                      </div>
-                    ))
-                  )}
-                </div>
+                  ))
+                )}
               </div>
+            </div>
 
+            <div>
+              <h3 className="text-xl font-semibold text-teal-700 flex items-center">
+                <Presentation className="w-5 h-5 mr-2 text-teal-600" />
+                Conference Publications
+              </h3>
+              <div className="mt-4 space-y-4">
+                {approvedConferences.length === 0 ? (
+                  <div className="bg-teal-50 border border-teal-200 p-4 rounded-lg text-center">
+                    <p className="text-teal-700 italic">No approved conference publications yet</p>
+                  </div>
+                ) : (
+                  approvedConferences.map((publication) => (
+                    <div 
+                      key={publication._id} 
+                      className="bg-teal-50 p-4 rounded-lg shadow-sm border border-teal-100"
+                    >
+                      <h3 className="text-lg font-semibold text-teal-900 mb-2">{publication.title}</h3>
+                      <div className="space-y-1 text-teal-800">
+                        <p><strong>Authors:</strong> {publication.authors.join(", ")}</p>
+                        <p><strong>Conference:</strong> {publication.conferenceName}</p>
+                        <p><strong>Year:</strong> {publication.year}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>

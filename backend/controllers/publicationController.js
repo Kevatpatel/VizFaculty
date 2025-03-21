@@ -38,6 +38,9 @@ const getPendingPublications = async (req, res) => {
   }
 };
 
+
+
+
 // Approve a publication (change status to "approved")
 const approvePublication = async (req, res) => {
   try {
