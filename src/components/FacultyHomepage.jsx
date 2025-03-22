@@ -11,7 +11,9 @@ import {
   User, 
   Download,
   LogOut,
-  Settings 
+  Settings,
+  Edit,
+  Trash
 } from "lucide-react";
 
 const FacultyHomepage = () => {
@@ -92,6 +94,38 @@ const FacultyHomepage = () => {
     const data = new Blob([excelBuffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 
     saveAs(data, "Approved_Publications.xlsx");
+  };
+
+  const handleEditJournal = (publicationId) => {
+    navigate(`/employee-dashboard/journal-publication-edit/${publicationId}`);
+  };
+
+  const handleEditConference = (publicationId) => {
+    navigate(`/employee-dashboard/conference-publication-edit/${publicationId}`);
+  };
+
+  const handleDeleteJournal = async (publicationId) => {
+    if (window.confirm("Are you sure you want to delete this journal publication?")) {
+      try {
+        await axios.delete(`http://localhost:5000/api/journal-publications/${publicationId}`);
+        setApprovedJournals(approvedJournals.filter(pub => pub._id !== publicationId));
+      } catch (error) {
+        console.error("❌ Error deleting journal publication:", error);
+        alert("Failed to delete the publication. Please try again.");
+      }
+    }
+  };
+
+  const handleDeleteConference = async (publicationId) => {
+    if (window.confirm("Are you sure you want to delete this conference publication?")) {
+      try {
+        await axios.delete(`http://localhost:5000/api/conference-publications/${publicationId}`);
+        setApprovedConferences(approvedConferences.filter(pub => pub._id !== publicationId));
+      } catch (error) {
+        console.error("❌ Error deleting conference publication:", error);
+        alert("Failed to delete the publication. Please try again.");
+      }
+    }
   };
 
   return (
@@ -196,11 +230,31 @@ const FacultyHomepage = () => {
                       key={publication._id} 
                       className="bg-teal-50 p-4 rounded-lg shadow-sm border border-teal-100"
                     >
-                      <h3 className="text-lg font-semibold text-teal-900 mb-2">{publication.title}</h3>
-                      <div className="space-y-1 text-teal-800">
-                        <p><strong>Authors:</strong> {publication.authors.join(", ")}</p>
-                        <p><strong>Journal:</strong> {publication.journalName}</p>
-                        <p><strong>Year:</strong> {publication.year}</p>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-grow">
+                          <h3 className="text-lg font-semibold text-teal-900 mb-2">{publication.title}</h3>
+                          <div className="space-y-1 text-teal-800">
+                            <p><strong>Authors:</strong> {publication.authors.join(", ")}</p>
+                            <p><strong>Journal:</strong> {publication.journalName}</p>
+                            <p><strong>Year:</strong> {publication.year}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 ml-4">
+                          <button 
+                            onClick={() => handleEditJournal(publication._id)}
+                            className="p-2 text-teal-600 hover:text-teal-800 hover:bg-teal-100 rounded-full transition"
+                            title="Edit publication"
+                          >
+                            <Edit className="w-5 h-5" />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteJournal(publication._id)}
+                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full transition"
+                            title="Delete publication"
+                          >
+                            <Trash className="w-5 h-5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))
@@ -224,11 +278,31 @@ const FacultyHomepage = () => {
                       key={publication._id} 
                       className="bg-teal-50 p-4 rounded-lg shadow-sm border border-teal-100"
                     >
-                      <h3 className="text-lg font-semibold text-teal-900 mb-2">{publication.title}</h3>
-                      <div className="space-y-1 text-teal-800">
-                        <p><strong>Authors:</strong> {publication.authors.join(", ")}</p>
-                        <p><strong>Conference:</strong> {publication.conferenceName}</p>
-                        <p><strong>Year:</strong> {publication.year}</p>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-grow">
+                          <h3 className="text-lg font-semibold text-teal-900 mb-2">{publication.title}</h3>
+                          <div className="space-y-1 text-teal-800">
+                            <p><strong>Authors:</strong> {publication.authors.join(", ")}</p>
+                            <p><strong>Conference:</strong> {publication.conferenceName}</p>
+                            <p><strong>Year:</strong> {publication.year}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2 ml-4">
+                          <button 
+                            onClick={() => handleEditConference(publication._id)}
+                            className="p-2 text-teal-600 hover:text-teal-800 hover:bg-teal-100 rounded-full transition"
+                            title="Edit publication"
+                          >
+                            <Edit className="w-5 h-5" />
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteConference(publication._id)}
+                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full transition"
+                            title="Delete publication"
+                          >
+                            <Trash className="w-5 h-5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))

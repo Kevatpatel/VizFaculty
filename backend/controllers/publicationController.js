@@ -1,5 +1,6 @@
 import Publication from "../models/Publication.js";
-
+import JournalPublication from "../models/JournalPublication.js"
+import ConferencePublication from "../models/ConferencePublication.js"
 // Add a new publication with status "pending"
 const addPublication = async (req, res) => {
   try {
@@ -24,6 +25,26 @@ const addPublication = async (req, res) => {
   } catch (error) {
     console.error("Error saving publication:", error);
     res.status(500).json({ error: "Server error" });
+  }
+};
+const getJournalCount = async (req, res) => {
+  try {
+    const count = await JournalPublication.countDocuments({ status: "approved" });
+    res.json({ count });
+  } catch (error) {
+    console.error("❌ Error fetching journal count:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// Controller to get count of approved conference publications
+const getConferenceCount = async (req, res) => {
+  try {
+    const count = await ConferencePublication.countDocuments({ status: "approved" });
+    res.json({ count });
+  } catch (error) {
+    console.error("❌ Error fetching conference count:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
@@ -73,4 +94,4 @@ const rejectPublication = async (req, res) => {
   }
 };
 
-export { addPublication, getPendingPublications, approvePublication, rejectPublication };
+export { addPublication, getPendingPublications, approvePublication, rejectPublication,getConferenceCount,getJournalCount };
