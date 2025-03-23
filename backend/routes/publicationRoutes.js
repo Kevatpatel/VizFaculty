@@ -1,5 +1,5 @@
 import express from "express";
-import { addPublication, getPendingPublications, approvePublication, rejectPublication,getConferenceCount,getJournalCount } from "../controllers/publicationController.js";
+import { addPublication, getPendingPublications,getDepartmentWiseCount, approvePublication, rejectPublication,getConferenceCount,getJournalCount } from "../controllers/publicationController.js";
 
 const router = express.Router();
 
@@ -9,4 +9,8 @@ router.put("/approve/:id", approvePublication); // Approve a publication
 router.delete("/reject/:id", rejectPublication); // Reject a publication
 router.get("/api/journal-publications/count", getJournalCount);
 router.get("/api/conference-publications/count", getConferenceCount);
+router.get("/api/publications/department-wise-count", getDepartmentWiseCount);
+
+
+
 export default router;

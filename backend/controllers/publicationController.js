@@ -29,7 +29,7 @@ const addPublication = async (req, res) => {
 };
 const getJournalCount = async (req, res) => {
   try {
-    const count = await JournalPublication.countDocuments({ status: "approved" });
+    const count = await JournalPublication.countDocuments({ publicationStatus: "approved" });
     res.json({ count });
   } catch (error) {
     console.error("❌ Error fetching journal count:", error);
@@ -47,6 +47,41 @@ const getConferenceCount = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+const getDepartmentWiseCount = async (req, res) => {
+  try {
+    // Aggregate count of approved journal publications by department
+    const journalDeptCounts = await JournalPublication.aggregate([
+      { $match: { publicationStatus: "approved" } },
+      { $group: { _id: "$department", count: { $sum: 1 } } }
+    ]);
+
+    // Aggregate count of approved conference publications by department
+    const conferenceDeptCounts = await ConferencePublication.aggregate([
+      { $match: { status: "approved" } },
+      { $group: { _id: "$department", count: { $sum: 1 } } }
+    ]);
+
+    const departmentCounts = new Map();
+
+    // Combine counts from Journal and Conference
+    journalDeptCounts.forEach(({ _id, count }) => {
+      departmentCounts.set(_id, (departmentCounts.get(_id) || 0) + count);
+    });
+
+    conferenceDeptCounts.forEach(({ _id, count }) => {
+      departmentCounts.set(_id, (departmentCounts.get(_id) || 0) + count);
+    });
+
+    // Convert to array format for frontend
+    const formattedData = Array.from(departmentCounts, ([name, value]) => ({ name, value }));
+
+    res.json(formattedData);
+  } catch (error) {
+    console.error("❌ Error fetching department-wise publication count:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 
 // Get only pending publications
 const getPendingPublications = async (req, res) => {
@@ -94,4 +129,4 @@ const rejectPublication = async (req, res) => {
   }
 };
 
-export { addPublication, getPendingPublications, approvePublication, rejectPublication,getConferenceCount,getJournalCount };
+export { addPublication,getDepartmentWiseCount, getPendingPublications, approvePublication, rejectPublication,getConferenceCount,getJournalCount };
